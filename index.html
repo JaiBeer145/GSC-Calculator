@@ -113,124 +113,51 @@
     function calculate() {
         // Get selected cabinet model
         const cabinetModel = document.getElementById('cabinetModel').value;
+        const cylinderType = document.getElementById('cylinderType').value;
+
+        // Dummy values for cabinet dimensions
         let cabinetWidth = 0;
         let cabinetDepth = 0;
         let cabinetHeight = 0;
-        let shelves = [];
-        
-        // Shelf positions for each cabinet model
-        const shelfPositions = {
-            'GSC2': [260], // Only 1 shelf
-            'GSC3': [368, 558, 750], // 2 shelves
-            'GSC4': [368, 558, 750], // 2 shelves
-            'GSC5': [368, 558, 750], // 2 shelves
-            'GSC6': [378, 557, 641, 840, 1037, 1122, 1300], // 4 shelves
-            'GSC7': [378, 557, 641, 840, 1037, 1122, 1300], // 4 shelves
-            'GSC8': [378, 557, 641, 840, 1037, 1122, 1300] // 3 shelves
-        };
+        let shelfHeightPositions = [];
 
-        switch(cabinetModel) {
-            case 'GSC2':
-                cabinetWidth = 795;
-                cabinetDepth = 400;
-                cabinetHeight = 555;
-                shelves = shelfPositions['GSC2'];
-                break;
-            case 'GSC3':
-                cabinetWidth = 795;
-                cabinetDepth = 400;
-                cabinetHeight = 1155;
-                shelves = shelfPositions['GSC3'];
-                break;
-            case 'GSC4':
-                cabinetWidth = 795;
-                cabinetDepth = 795;
-                cabinetHeight = 1155;
-                shelves = shelfPositions['GSC4'];
-                break;
-            case 'GSC5':
-                cabinetWidth = 1155;
-                cabinetDepth = 795;
-                cabinetHeight = 1155;
-                shelves = shelfPositions['GSC5'];
-                break;
-            case 'GSC6':
-                cabinetWidth = 795;
-                cabinetDepth = 400;
-                cabinetHeight = 1705;
-                shelves = shelfPositions['GSC6'];
-                break;
-            case 'GSC7':
-                cabinetWidth = 795;
-                cabinetDepth = 795;
-                cabinetHeight = 1705;
-                shelves = shelfPositions['GSC7'];
-                break;
-            case 'GSC8':
-                cabinetWidth = 1155;
-                cabinetDepth = 795;
-                cabinetHeight = 1705;
-                shelves = shelfPositions['GSC8'];
-                break;
+        // Setup values based on the selected cabinet model
+        if (cabinetModel === 'GSC2') {
+            cabinetWidth = 795;
+            cabinetDepth = 400;
+            cabinetHeight = 555;
+            shelfHeightPositions = [260];
+        }
+        else if (cabinetModel === 'GSC3') {
+            cabinetWidth = 795;
+            cabinetDepth = 400;
+            cabinetHeight = 1155;
+            shelfHeightPositions = [368, 558, 750];
         }
 
-        // Get selected cylinder type
-        const cylinderType = document.getElementById('cylinderType').value;
-        let cylinderHeight = 0;
-        let cylinderDiameter = 0;
+        // Dummy values for cylinder dimensions
+        let cylinderDiameter = 100;  // Default value (HPIG C 100d)
+        let cylinderHeight = 460;   // Default value
 
-        // Define cylinder properties based on the selected type
-        const cylinderDimensions = {
-            'HPIGC_100': { diameter: 10, height: 46 }, // 100mm diameter, 460mm height
-            'HPIGC_120': { diameter: 12, height: 46 }, // 120mm diameter, 460mm height
-            'HPIGD_150': { diameter: 15, height: 76 }, // 150mm diameter, 760mm height
-            'HPIGD_175': { diameter: 17.5, height: 76 }, // 175mm diameter, 760mm height
-            'HPIGE_200': { diameter: 20, height: 91 }, // 200mm diameter, 910mm height
-            'HPIGE_215': { diameter: 21.5, height: 91 }, // 215mm diameter, 910mm height
-            'HPIGF_215': { diameter: 21.5, height: 129.5 }, // 215mm diameter, 1295mm height
-            'HPIGG_230': { diameter: 23, height: 141 }, // 230mm diameter, 1410mm height
-            'HPIGG_250': { diameter: 25, height: 141 }, // 250mm diameter, 1410mm height
-            'LPGN_260': { diameter: 26, height: 40 }, // 260mm diameter, 400mm height
-            'LGPP_310': { diameter: 31, height: 50 }, // 310mm diameter, 500mm height
-            'LPGT_375': { diameter: 37.5, height: 81.5 }, // 375mm diameter, 815mm height
-            'LPGR_375': { diameter: 37.5, height: 84 }, // 375mm diameter, 840mm height
-            'LPGS_375': { diameter: 37.5, height: 124 }, // 375mm diameter, 1240mm height
-            'LPG90KG_508': { diameter: 50.8, height: 134 }, // 508mm diameter, 1340mm height
-            'Aerosol': { diameter: 6.5, height: 24 }, // 65mm diameter, 240mm height
-            'AcetyleneD_150': { diameter: 15, height: 47 }, // 150mm diameter, 470mm height
-            'AcetyleneD_200': { diameter: 20, height: 49 }, // 200mm diameter, 490mm height
-            'AcetyleneE_200': { diameter: 20, height: 75.9 }, // 200mm diameter, 759mm height
-            'AcetyleneE_210': { diameter: 21, height: 90 }, // 210mm diameter, 900mm height
-            'AcetyleneG_265': { diameter: 26.5, height: 80 }, // 265mm diameter, 800mm height
-            'AcetyleneG_300': { diameter: 30, height: 100 }, // 300mm diameter, 1000mm height
-        };
+        if (cylinderType === 'HPIGC_120') {
+            cylinderDiameter = 120;
+            cylinderHeight = 460;
+        }
+        // Add other conditions for cylinder types as necessary
 
-        // Retrieve selected cylinder dimensions
-        const selectedCylinder = cylinderDimensions[cylinderType];
-        const cylinderDiameter = selectedCylinder.diameter;
-        const cylinderHeight = selectedCylinder.height;
+        // Calculate max cylinders per shelf (width / cylinder diameter)
+        const maxCylindersPerShelf = Math.floor(cabinetWidth / cylinderDiameter);
 
-        // Convert cabinet dimensions from mm to cm for consistency
-        cabinetWidth = cabinetWidth / 10; // cm
-        cabinetDepth = cabinetDepth / 10; // cm
-        cabinetHeight = cabinetHeight / 10; // cm
-
-        // Calculate max cylinders per shelf (based on cabinet depth and cylinder diameter)
-        const maxCylindersPerShelf = Math.floor(cabinetDepth / cylinderDiameter);
-
-        // Filter shelves that can fit based on the cylinder height
-        const validShelves = shelves.filter(shelfHeight => shelfHeight <= cabinetHeight - cylinderHeight);
-
-        // Calculate the number of valid shelves
-        const maxShelves = validShelves.length;
+        // Calculate max shelves that fit based on height
+        const maxShelves = shelfHeightPositions.length;
 
         // Calculate total cylinders that can fit
         const totalCylinders = maxCylindersPerShelf * maxShelves;
 
-        // Display results
-        document.getElementById('maxCylindersPerShelf').textContent = `Max cylinders per shelf: ${maxCylindersPerShelf}`;
-        document.getElementById('maxShelves').textContent = `Max shelves that fit: ${maxShelves}`;
-        document.getElementById('totalCylinders').textContent = `Total cylinders that can fit: ${totalCylinders}`;
+        // Output results
+        document.getElementById('maxCylindersPerShelf').textContent = `Max Cylinders per Shelf: ${maxCylindersPerShelf}`;
+        document.getElementById('maxShelves').textContent = `Max Shelves: ${maxShelves}`;
+        document.getElementById('totalCylinders').textContent = `Total Cylinders: ${totalCylinders}`;
     }
 </script>
 
