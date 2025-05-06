@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cabinet Cylinder Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .calculator-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            margin: auto;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+
+        select, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #results {
+            font-size: 18px;
+            margin-top: 20px;
+        }
+
+        #results p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="calculator-container">
+    <h1>Cabinet Cylinder Calculator</h1>
+
+    <label for="cabinetModel">Select Cabinet Model:</label>
+    <select id="cabinetModel">
+        <option value="GSC2">GSC2 (795mmW x 400mmD x 555mmH, 1 shelf)</option>
+        <option value="GSC3">GSC3 (795mmW x 400mmD x 1155mmH, 2 shelves)</option>
+        <option value="GSC4">GSC4 (795mmW x 795mmD x 1155mmH, 2 shelves)</option>
+        <option value="GSC5">GSC5 (1155mmW x 795mmD x 1155mmH, 2 shelves)</option>
+        <option value="GSC6">GSC6 (795mmW x 400mmD x 1705mmH, 4 shelves)</option>
+        <option value="GSC7">GSC7 (795mmW x 795mmD x 1705mmH, 4 shelves)</option>
+        <option value="GSC8">GSC8 (1155mmW x 795mmD x 1705mmH, 3 shelves)</option>
+    </select>
+
+    <label for="cylinderType">Select Cylinder Type:</label>
+    <select id="cylinderType">
+        <option value="HPIGC_100">HPIG C (100d), 100mm diameter, 460mm height</option>
+        <option value="HPIGC_120">HPIG C (120d), 120mm diameter, 460mm height</option>
+        <option value="HPIGD_150">HPIG D (150d), 150mm diameter, 760mm height</option>
+        <option value="HPIGD_175">HPIG D (175d), 175mm diameter, 760mm height</option>
+        <option value="HPIGE_200">HPIG E (200d), 200mm diameter, 910mm height</option>
+        <option value="HPIGE_215">HPIG E (215d), 215mm diameter, 910mm height</option>
+        <option value="HPIGF_215">HPIG F (215d), 215mm diameter, 1295mm height</option>
+        <option value="HPIGG_230">HPIG G (230d), 230mm diameter, 1410mm height</option>
+        <option value="HPIGG_250">HPIG G (250d), 250mm diameter, 1410mm height</option>
+        <option value="LPGN_260">LPG N, 260mm diameter, 400mm height</option>
+        <option value="LGPP_310">LPG P, 310mm diameter, 500mm height</option>
+        <option value="LPGT_375">LPG T, 375mm diameter, 815mm height</option>
+        <option value="LPGR_375">LPG R, 375mm diameter, 840mm height</option>
+        <option value="LPGS_375">LPG S, 375mm diameter, 1240mm height</option>
+        <option value="LPG90KG_508">LPG 90KG, 508mm diameter, 1340mm height</option>
+        <option value="Aerosol">Aerosol Canister, 65mm diameter, 240mm height</option>
+        <option value="AcetyleneD_150">Acetylene D (150d), 150mm diameter, 470mm height</option>
+        <option value="AcetyleneD_200">Acetylene D (200d), 200mm diameter, 490mm height</option>
+        <option value="AcetyleneE_200">Acetylene E (200d), 200mm diameter, 759mm height</option>
+        <option value="AcetyleneE_210">Acetylene E (210d), 210mm diameter, 900mm height</option>
+        <option value="AcetyleneG_265">Acetylene G (265d), 265mm diameter, 800mm height</option>
+        <option value="AcetyleneG_300">Acetylene G (300d), 300mm diameter, 1000mm height</option>
+    </select>
+
+    <button onclick="calculate()">Calculate</button>
+
+    <div id="results">
+        <p id="maxCylindersPerShelf"></p>
+        <p id="maxShelves"></p>
+        <p id="totalCylinders"></p>
+    </div>
+</div>
+
+<script>
+    function calculate() {
+        // Get selected cabinet model
+        const cabinetModel = document.getElementById('cabinetModel').value;
+        let cabinetWidth = 0;
+        let cabinetDepth = 0;
+        let cabinetHeight = 0;
+        let shelves = [];
+        
+        // Shelf positions for each cabinet model
+        const shelfPositions = {
+            'GSC2': [260], // Only 1 shelf
+            'GSC3': [368, 558, 750], // 2 shelves
+            'GSC4': [368, 558, 750], // 2 shelves
+            'GSC5': [368, 558, 750], // 2 shelves
+            'GSC6': [378, 557, 641, 840, 1037, 1122, 1300], // 4 shelves
+            'GSC7': [378, 557, 641, 840, 1037, 1122, 1300], // 4 shelves
+            'GSC8': [378, 557, 641, 840, 1037, 1122, 1300] // 3 shelves
+        };
+
+        switch(cabinetModel) {
+            case 'GSC2':
+                cabinetWidth = 795;
+                cabinetDepth = 400;
+                cabinetHeight = 555;
+                shelves = shelfPositions['GSC2'];
+                break;
+            case 'GSC3':
+                cabinetWidth = 795;
+                cabinetDepth = 400;
+                cabinetHeight = 1155;
+                shelves = shelfPositions['GSC3'];
+                break;
+            case 'GSC4':
+                cabinetWidth = 795;
+                cabinetDepth = 795;
+                cabinetHeight = 1155;
+                shelves = shelfPositions['GSC4'];
+                break;
+            case 'GSC5':
+                cabinetWidth = 1155;
+                cabinetDepth = 795;
+                cabinetHeight = 1155;
+                shelves = shelfPositions['GSC5'];
+                break;
+            case 'GSC6':
+                cabinetWidth = 795;
+                cabinetDepth = 400;
+                cabinetHeight = 1705;
+                shelves = shelfPositions['GSC6'];
+                break;
+            case 'GSC7':
+                cabinetWidth = 795;
+                cabinetDepth = 795;
+                cabinetHeight = 1705;
+                shelves = shelfPositions['GSC7'];
+                break;
+            case 'GSC8':
+                cabinetWidth = 1155;
+                cabinetDepth = 795;
+                cabinetHeight = 1705;
+                shelves = shelfPositions['GSC8'];
+                break;
+        }
+
+        // Get selected cylinder type
+        const cylinderType = document.getElementById('cylinderType').value;
+        let cylinderHeight = 0;
+        let cylinderDiameter = 0;
+
+        // Define cylinder properties based on the selected type
+        const cylinderDimensions = {
+            'HPIGC_100': { diameter: 10, height: 46 }, // 100mm diameter, 460mm height
+            'HPIGC_120': { diameter: 12, height: 46 }, // 120mm diameter, 460mm height
+            'HPIGD_150': { diameter: 15, height: 76 }, // 150mm diameter, 760mm height
+            'HPIGD_175': { diameter: 17.5, height: 76 }, // 175mm diameter, 760mm height
+            'HPIGE_200': { diameter: 20, height: 91 }, // 200mm diameter, 910mm height
+            'HPIGE_215': { diameter: 21.5, height: 91 }, // 215mm diameter, 910mm height
+            'HPIGF_215': { diameter: 21.5, height: 129.5 }, // 215mm diameter, 1295mm height
+            'HPIGG_230': { diameter: 23, height: 141 }, // 230mm diameter, 1410mm height
+            'HPIGG_250': { diameter: 25, height: 141 }, // 250mm diameter, 1410mm height
+            'LPGN_260': { diameter: 26, height: 40 }, // 260mm diameter, 400mm height
+            'LGPP_310': { diameter: 31, height: 50 }, // 310mm diameter, 500mm height
+            'LPGT_375': { diameter: 37.5, height: 81.5 }, // 375mm diameter, 815mm height
+            'LPGR_375': { diameter: 37.5, height: 84 }, // 375mm diameter, 840mm height
+            'LPGS_375': { diameter: 37.5, height: 124 }, // 375mm diameter, 1240mm height
+            'LPG90KG_508': { diameter: 50.8, height: 134 }, // 508mm diameter, 1340mm height
+            'Aerosol': { diameter: 6.5, height: 24 }, // 65mm diameter, 240mm height
+            'AcetyleneD_150': { diameter: 15, height: 47 }, // 150mm diameter, 470mm height
+            'AcetyleneD_200': { diameter: 20, height: 49 }, // 200mm diameter, 490mm height
+            'AcetyleneE_200': { diameter: 20, height: 75.9 }, // 200mm diameter, 759mm height
+            'AcetyleneE_210': { diameter: 21, height: 90 }, // 210mm diameter, 900mm height
+            'AcetyleneG_265': { diameter: 26.5, height: 80 }, // 265mm diameter, 800mm height
+            'AcetyleneG_300': { diameter: 30, height: 100 }, // 300mm diameter, 1000mm height
+        };
+
+        // Retrieve selected cylinder dimensions
+        const selectedCylinder = cylinderDimensions[cylinderType];
+        const cylinderDiameter = selectedCylinder.diameter;
+        const cylinderHeight = selectedCylinder.height;
+
+        // Convert cabinet dimensions from mm to cm for consistency
+        cabinetWidth = cabinetWidth / 10; // cm
+        cabinetDepth = cabinetDepth / 10; // cm
+        cabinetHeight = cabinetHeight / 10; // cm
+
+        // Calculate max cylinders per shelf (based on cabinet depth and cylinder diameter)
+        const maxCylindersPerShelf = Math.floor(cabinetDepth / cylinderDiameter);
+
+        // Filter shelves that can fit based on the cylinder height
+        const validShelves = shelves.filter(shelfHeight => shelfHeight <= cabinetHeight - cylinderHeight);
+
+        // Calculate the number of valid shelves
+        const maxShelves = validShelves.length;
+
+        // Calculate total cylinders that can fit
+        const totalCylinders = maxCylindersPerShelf * maxShelves;
+
+        // Display results
+        document.getElementById('maxCylindersPerShelf').textContent = `Max cylinders per shelf: ${maxCylindersPerShelf}`;
+        document.getElementById('maxShelves').textContent = `Max shelves that fit: ${maxShelves}`;
+        document.getElementById('totalCylinders').textContent = `Total cylinders that can fit: ${totalCylinders}`;
+    }
+</script>
+
+</body>
+</html>
